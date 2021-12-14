@@ -1,37 +1,30 @@
-from importlib import import_module
 import os
-from flask import Flask, render_template, Response
+from connection import s3_connection, s3_put_object
+from config import AWS_S3_BUCKET_NAME, AWS_S3_BUCKET_REGION
+from flask import Flask, send_from_directory
+from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS
+from api.ApiHandler import ApiHandler
 
-# import camera driver
-if os.environ.get('CAMERA'):
-    Camera = import_module('camera_' + os.environ['CAMERA']).Camera
-else:
-    from camera import Camera
+s3 = s3_connection()
 
-app = Flask(__name__)
+def auto_upload(file_name):
+    filename = file_name
+    filepath = './' + filename
 
+    ret1 = s3_put_object(s3, AWS_S3_BUCKET_NAME, './dumpedLog.txt', 'dumpedLog.txt')
+    ret2 = s3_put_object(s3, AWS_S3_BUCKET_NAME, filepath, filename)
+    if ret1 and ret2:
+        print("파일 저장 성공")
+    else:
+        print("파일 저장 실패")
 
-@app.route('/')
-def index():
-    """Video streaming home page."""
-    return render_template('index.html')
+app = Flask(__name__, static_url_path='', static_folder='frontend/build')
+CORS(app)
+api = Api(app)
 
+@app.route("/", defaults={'path':''})
+def serve(path):
+    return send_from_directory(app.static_folder, 'index.html')
 
-def gen(camera):
-    """Video streaming generator function."""
-    while True:
-        print('gen!!')
-        frame = camera.frames()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-
-@app.route('/video_start')
-def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True, port=5001)
+api.add_resource(ApiHandler, '/')
