@@ -27,8 +27,8 @@ cloud:
   aws:
     credentials:
       instance-profile: false
-      access-key: AKIAZZF3SST4PI2LQEK3
-      secret-key: 8/NnlXtIjsHVg54eLetZCmLQNluVgbvRhV38hu4O
+      access-key: your_access_key
+      secret-key: your_secret_key
     region:
       auto: false
       static: ap-northeast-2
@@ -44,4 +44,4 @@ logging:
 
 aws:
   s3:
-    bucket: capstonedesignbucket
+    bucket: your_bucket
