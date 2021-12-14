@@ -1,0 +1,47 @@
+spring:
+  profiles:
+    group:
+      localhwang: "devhwang,common"
+
+---
+
+spring:
+  config:
+    profile:
+      name: devhwang
+    activate:
+      on-profile: devhwang
+  url:
+    base: http://localhost:8080
+
+front:
+  url: http://localhost:3000/
+
+local:
+  file:
+    path: C:\Users\hsy94\Desktop\yolov5\backend
+
+---
+
+cloud:
+  aws:
+    credentials:
+      instance-profile: false
+      access-key: AKIAZZF3SST4PI2LQEK3
+      secret-key: 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
+    region:
+      auto: false
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+
+aws:
+  s3:
+    bucket: capstonedesignbucket
